@@ -6,17 +6,13 @@ import config
 
 config = config.Config(".\\server\\config.yaml")
 
-if config.epics['state'] == 'virtual':
-    virtual = True
-else:
-    virtual = False
 verbose = True
 
-if virtual:
+if config.epics['set-env']:
     import os
-    os.environ["EPICS_CA_ADDR_LIST"] = "192.168.83.246"
-    os.environ["EPICS_CA_AUTO_ADDR_LIST"] = "NO"
-    os.environ["EPICS_CA_SERVER_PORT"] = "6020"
+    os.environ["EPICS_CA_ADDR_LIST"] = config.epics['addr-list']
+    os.environ["EPICS_CA_AUTO_ADDR_LIST"] = config.epics['auto-addr']
+    os.environ["EPICS_CA_SERVER_PORT"] = config.epics['server-port']
     import epics
 else:
     import epics

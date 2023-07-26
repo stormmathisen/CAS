@@ -13,6 +13,10 @@ class Config(object):
 
         self.epics = {}
         self.epics['state'] = None
+        self.epics['set-env'] = None
+        self.epics['addr-list'] = None
+        self.epics['auto-addr'] = None
+        self.epics['server-port'] = None
         self.epics['pv-list'] = []
         if path is None:
             path = '.\\config.yaml'
@@ -29,4 +33,14 @@ class Config(object):
             self.auth['api-keys'] = config['auth']['api-keys']
 
             self.epics['state'] = config['epics']['state']
+            self.epics['set-env'] = config['epics']['set-env']
+            self.epics['addr-list'] = config['epics']['addr-list']
+            self.epics['auto-addr'] = config['epics']['auto-addr']
+            self.epics['server-port'] = config['epics']['server-port']
             self.epics['pv-list'] = config['epics']['pv-list']
+
+if __name__ == '__main__':
+    config = Config()
+    print(config.server)
+    print(config.auth)
+    print(config.epics)
