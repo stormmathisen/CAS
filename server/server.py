@@ -54,6 +54,8 @@ def connect(sid, environ, auth):
 def disconnect(sid):
     if verbose: print(f'Client {Client_list[sid]["sid"]} disconnected from {Client_list[sid]["ip"]}')
     Client_list.pop(sid)
+    #TODO: Log the disconnection
 
 if __name__ == '__main__':
+    #TODO: Log the start of the server
     wsgi.server(eventlet.listen((config.server['ip'], config.server['port'])), site=app)
