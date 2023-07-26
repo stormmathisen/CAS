@@ -1,6 +1,6 @@
 server: #Details of server configuration
   name: test_server
-  ip: 
+  ip: 127.0.0.1
   port: 5000
 
 auth:
@@ -11,5 +11,5 @@ auth:
 
 epics:
   state: VIRTUAL
-  PVs:
+  pv-list:
     - [CLA-C2V-DIA-BPM-01:X, true]

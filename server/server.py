@@ -2,7 +2,14 @@ import eventlet
 from eventlet import wsgi
 import socketio
 
-virtual = True
+import config
+
+config = config.Config(".\\server\\config.yaml")
+
+if config.epics['state'] == 'virtual':
+    virtual = True
+else:
+    virtual = False
 verbose = True
 
 if virtual:
@@ -14,8 +21,10 @@ if virtual:
 else:
     import epics
 
-def check_auth(client_id, secret):
-    if secret == "I am your father":
+def check_auth(client_ip, secret):
+    if secret in config.auth['api-keys']:
+        return True
+    if client_ip in config.auth['ip-list']:
         return True
     else:
         return False
@@ -32,7 +41,7 @@ def connect(sid, environ, auth):
     new_client = {}
     new_client['sid'] = sid
     new_client['ip'] = environ['REMOTE_ADDR']
-    if check_auth(sid, auth):
+    if check_auth(environ['REMOTE_ADDR'], auth):
         new_client['auth'] = auth
         Client_list[sid] = new_client
         sio.emit('auth_success', room=sid)
@@ -51,4 +60,4 @@ def disconnect(sid):
     Client_list.pop(sid)
 
 if __name__ == '__main__':
-    wsgi.server(eventlet.listen(('', 5000)), site=app)
+    wsgi.server(eventlet.listen((config.server['ip'], config.server['port'])), site=app)

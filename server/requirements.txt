@@ -1,4 +1,7 @@
 numpy
 python-socketio
+python-socketio[client]
 pyepics
 eventlet
+pyyaml
+requests
