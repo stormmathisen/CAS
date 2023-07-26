@@ -10,7 +10,6 @@ def connect():
 @sio.event
 def disconnect():
     print('disconnected from server')
-    exit()
 
 @sio.event
 def auth_success():
@@ -22,3 +21,7 @@ def auth_fail():
 
 sio.connect('http://localhost:5000', auth="I am your father")
 sio.disconnect()
+time.sleep(1)
+sio.connect('http://localhost:5000', auth="I am NOT your father")
+sio.disconnect()
+

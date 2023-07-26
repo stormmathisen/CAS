@@ -15,7 +15,10 @@ else:
     import epics
 
 def check_auth(client_id, secret):
-    return True
+    if secret == "I am your father":
+        return True
+    else:
+        return False
 
 PV_list = {}
 Buffer_list = {}
@@ -33,10 +36,19 @@ def connect(sid, environ, auth):
         new_client['auth'] = auth
         Client_list[sid] = new_client
         sio.emit('auth_success', room=sid)
+        if verbose: print(f'Client {Client_list[sid]["sid"]} connected from {Client_list[sid]["ip"]}')
     else:
+        new_client['auth'] = None
+        Client_list[sid] = new_client
         sio.emit('auth_fail', room=sid)
-    if verbose: print(f'Client {Client_list[sid]} connected from {sid}')
+        if verbose: print(f'Client {Client_list[sid]["sid"]} refused from {Client_list[sid]["ip"]}')
+        sio.disconnect(sid)
     #TODO: Log the connection
+
+@sio.event
+def disconnect(sid):
+    if verbose: print(f'Client {Client_list[sid]["sid"]} disconnected from {Client_list[sid]["ip"]}')
+    Client_list.pop(sid)
 
 if __name__ == '__main__':
     wsgi.server(eventlet.listen(('', 5000)), site=app)
