@@ -1,13 +1,15 @@
-- server: #Details of server configuration
-  - name: 'test_server'
-  - ip: ''
-  - port: 5000
+server: #Details of server configuration
+  name: test_server
+  ip: 
+  port: 5000
+
 auth:
-  - ip-list:
-    - '127.0.0.1'
-  - api-keys:
-    - 'I am your Father'
+  ip-list:
+    - 127.0.0.1
+  api-keys:
+    - I am your Father
+
 epics:
-  - state: 'VIRTUAL'
-  - PVs:
-    - ['CLA-C2V-DIA-BPM-01:X', true]
+  state: VIRTUAL
+  PVs:
+    - [CLA-C2V-DIA-BPM-01:X, true]
