@@ -57,12 +57,15 @@ def disconnect(sid):
     #TODO: Log the disconnection
 
 @sio.event
-def get_value(sid, pv):
+def get_value(sid, payload):
+    pv = payload["pv"]
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested value of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     value = epics.caget(pv)
-    sio.emit('get_value', value, room=sid)
+    sio.emit('get_value', {'pv': pv, 'value': value}, room=sid)
+
+
 
 if __name__ == '__main__':
     #TODO: Log the start of the server

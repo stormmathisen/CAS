@@ -20,11 +20,13 @@ def auth_fail():
     print('auth fail')
 
 @sio.event
-def get_value(value):
-    print(value)
+def get_value(payload):
+    pv = payload['pv']
+    value = payload['value']
+    print(pv, ': ', value)
 
 sio.connect('http://localhost:5000', auth="I am your father")
 
-sio.emit('get_value', 'CLA-C2V-DIA-BPM-01:X')
+sio.emit('get_value', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 sio.sleep(2)
 sio.disconnect()
