@@ -65,6 +65,15 @@ def get_value(sid, payload):
     value = epics.caget(pv)
     sio.emit('get_value', {'pv': pv, 'value': value}, room=sid)
 
+@sio.event
+def put_value(sid, payload):
+    pv = payload["pv"]
+    value = payload["value"]
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to put {value} to {pv}')
+    if config.epics['state'].lower() == "virtual":
+        pv = "VM-" + pv
+    epics.caput(pv, value)
+    sio.emit('put_value', {'pv': pv, 'value': value}, room=sid)
 
 
 if __name__ == '__main__':

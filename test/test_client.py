@@ -25,8 +25,15 @@ def get_value(payload):
     value = payload['value']
     print(pv, ': ', value)
 
+@sio.event
+def put_value(payload):
+    pv = payload['pv']
+    value = payload['value']
+    print(pv, ': ', value)
+
 sio.connect('http://localhost:5000', auth="I am your father")
 
+sio.emit('put_value', {'pv': 'CLA-C2V-DIA-BPM-01:X', 'value': 1.234})
 sio.emit('get_value', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 sio.sleep(2)
 sio.disconnect()
