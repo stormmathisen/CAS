@@ -1,8 +1,8 @@
 import eventlet
 from eventlet import wsgi
 import socketio
-
 import config
+import pv_buffer
 
 config = config.Config(".\\server\\config.yaml")
 
@@ -16,6 +16,13 @@ if config.epics['set-env']:
     import epics
 else:
     import epics
+
+def start_monitors(pvs):
+    for pv in pvs:
+        if config.epics['state'].lower() == "virtual":
+            pv = "VM-" + pv
+        PV_list[pv] = pv_buffer.PV_Buffer(pv)
+        PV_list[pv].start()
 
 def check_auth(client_ip, secret):
     if secret in config.auth['api-keys']:
@@ -75,7 +82,17 @@ def put_value(sid, payload):
     epics.caput(pv, value)
     sio.emit('put_value', {'pv': pv, 'value': value}, room=sid)
 
+@sio.event
+def get_buffer(sid, payload):
+    pv = payload["pv"]
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested buffer of {pv}')
+    if config.epics['state'].lower() == "virtual":
+        pv = "VM-" + pv
+    if pv in PV_list:
+        buffer, timestamps = PV_list[pv].get_buffer()
+        sio.emit('get_buffer', {'pv': pv, 'buffer': buffer, 'timestamps': timestamps}, room=sid)
 
 if __name__ == '__main__':
     #TODO: Log the start of the server
+    start_monitors(config.epics['pv-list'])
     wsgi.server(eventlet.listen((config.server['ip'], config.server['port'])), site=app)
