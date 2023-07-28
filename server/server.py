@@ -9,6 +9,7 @@ config = config.Config(".\\server\\config.yaml")
 verbose = True
 
 import os
+import sys
 
 if config.epics['set-env']:
     os.environ["EPICS_CA_ADDR_LIST"] = config.epics['addr-list']
@@ -17,8 +18,7 @@ if config.epics['set-env']:
     import epics
 else:
     import epics
-
-os.path.join(os.path.dirname('..\\clara\\machine'), 'static')
+sys.path.append("C:\\dev\\python\\apps\\clara\\machine")
 from pv import PVBuffer, PVArrayBuffer
 
 def start_monitors(pvs):
@@ -97,8 +97,8 @@ def get_buffer(sid, payload):
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv in PV_list:
-        buffer = PV_list[pv].getBuffer()
-        timestamps = PV_list[pv].getTimeBuffer()
+        buffer = list(PV_list[pv].getBuffer())
+        timestamps = list(PV_list[pv].getTimeBuffer())
         sio.emit('get_buffer', {'pv': pv, 'buffer': buffer, 'timestamps': timestamps}, room=sid)
 
 if __name__ == '__main__':
