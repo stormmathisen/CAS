@@ -2,7 +2,7 @@ import eventlet
 from eventlet import wsgi
 import socketio
 import config
-import pv_buffer
+
 
 config = config.Config(".\\server\\config.yaml")
 
@@ -17,12 +17,14 @@ if config.epics['set-env']:
 else:
     import epics
 
+os.path.join(os.path.dirname('..\\clara\\machine'), 'static')
+from pv import PVBuffer, PVArrayBuffer
+
 def start_monitors(pvs):
     for pv in pvs:
         if config.epics['state'].lower() == "virtual":
             pv = "VM-" + pv
-        PV_list[pv] = pv_buffer.PV_Buffer(pv)
-        PV_list[pv].start()
+        PV_list[pv] = PVBuffer(pv)
 
 def check_auth(client_ip, secret):
     if secret in config.auth['api-keys']:
@@ -33,7 +35,6 @@ def check_auth(client_ip, secret):
         return False
 
 PV_list = {}
-Buffer_list = {}
 Client_list = {}
 
 sio = socketio.Server()
@@ -69,7 +70,10 @@ def get_value(sid, payload):
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested value of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
-    value = epics.caget(pv)
+    if pv in PV_list.keys():
+        value = PV_list[pv].value
+    else:
+        value = epics.caget(pv)
     sio.emit('get_value', {'pv': pv, 'value': value}, room=sid)
 
 @sio.event
@@ -79,7 +83,10 @@ def put_value(sid, payload):
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested to put {value} to {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
-    epics.caput(pv, value)
+    if pv in PV_list.keys():
+        PV_list[pv].value = value
+    else:
+        epics.caput(pv, value)
     sio.emit('put_value', {'pv': pv, 'value': value}, room=sid)
 
 @sio.event
@@ -89,7 +96,8 @@ def get_buffer(sid, payload):
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv in PV_list:
-        buffer, timestamps = PV_list[pv].get_buffer()
+        buffer = PV_list[pv].getBuffer()
+        timestamps = PV_list[pv].getTimeBuffer()
         sio.emit('get_buffer', {'pv': pv, 'buffer': buffer, 'timestamps': timestamps}, room=sid)
 
 if __name__ == '__main__':
