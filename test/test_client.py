@@ -36,8 +36,8 @@ def get_buffer(payload):
     pv = payload['pv']
     buffer = payload['buffer']
     timestamps = payload['timestamps']
-    print(pv, ': ', buffer[-1])
-    print(pv, ': ', timestamps[-1])
+    print(pv, ': ', buffer)
+    print(pv, ': ', timestamps)
 
 sio.connect('http://localhost:5000', auth="I am your father")
 

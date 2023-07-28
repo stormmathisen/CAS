@@ -98,6 +98,8 @@ def get_buffer(sid, payload):
         pv = "VM-" + pv
     if pv in PV_list:
         buffer = list(PV_list[pv].getBuffer())
+        print(len(buffer))
+        print(buffer)
         timestamps = list(PV_list[pv].getTimeBuffer())
         sio.emit('get_buffer', {'pv': pv, 'buffer': buffer, 'timestamps': timestamps}, room=sid)
 
