@@ -17,4 +17,4 @@ class PVInterface(PVBuffer):
         self.resize_deque()
     
     def get_buffers(self):
-        return self.buffer, self.time_buffer
+        return list(self.buffer), list(self.time_buffer)
