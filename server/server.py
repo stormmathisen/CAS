@@ -8,8 +8,10 @@ config = config.Config(".\\server\\config.yaml")
 
 verbose = True
 
+import os
+import sys
+
 if config.epics['set-env']:
-    import os
     os.environ["EPICS_CA_ADDR_LIST"] = config.epics['addr-list']
     os.environ["EPICS_CA_AUTO_ADDR_LIST"] = config.epics['auto-addr']
     os.environ["EPICS_CA_SERVER_PORT"] = config.epics['server-port']
