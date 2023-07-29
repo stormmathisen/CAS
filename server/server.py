@@ -17,14 +17,13 @@ if config.epics['set-env']:
 else:
     import epics
 
-os.path.join(os.path.dirname('..\\clara\\machine'), 'static')
-from pv import PVBuffer, PVArrayBuffer
+import epics_interface as EI
 
 def start_monitors(pvs):
     for pv in pvs:
         if config.epics['state'].lower() == "virtual":
             pv = "VM-" + pv
-        PV_list[pv] = PVBuffer(pv)
+        PV_list[pv] = EI.PVInterface(pv)
 
 def check_auth(client_ip, secret):
     if secret in config.auth['api-keys']:
@@ -70,9 +69,9 @@ def get_value(sid, payload):
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested value of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
-    if pv in PV_list.keys():
+    try: #This is faster than checking if the PV exists in the dictionary
         value = PV_list[pv].value
-    else:
+    except KeyError:
         value = epics.caget(pv)
     sio.emit('get_value', {'pv': pv, 'value': value}, room=sid)
 
@@ -83,9 +82,9 @@ def put_value(sid, payload):
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested to put {value} to {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
-    if pv in PV_list.keys():
+    try: #This is faster than checking if the PV exists in the dictionary
         PV_list[pv].value = value
-    else:
+    except KeyError:
         epics.caput(pv, value)
     sio.emit('put_value', {'pv': pv, 'value': value}, room=sid)
 
@@ -96,8 +95,7 @@ def get_buffer(sid, payload):
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv in PV_list:
-        buffer = PV_list[pv].getBuffer()
-        timestamps = PV_list[pv].getTimeBuffer()
+        buffer, timestamps = PV_list[pv].get_buffers()
         sio.emit('get_buffer', {'pv': pv, 'buffer': buffer, 'timestamps': timestamps}, room=sid)
 
 if __name__ == '__main__':
