@@ -96,9 +96,11 @@ def get_buffer(sid, payload):
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested buffer of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
-    if pv in PV_list:
+    try: #This is faster than checking if the PV exists in the dictionary
         buffer, timestamps = PV_list[pv].get_buffers()
         sio.emit('get_buffer', {'pv': pv, 'buffer': buffer, 'timestamps': timestamps}, room=sid)
+    except KeyError:
+        sio.emit('get_buffer', {'pv': pv, 'buffer': None, 'timestamps': None}, room=sid)
 
 if __name__ == '__main__':
     #TODO: Log the start of the server
