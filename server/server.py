@@ -4,7 +4,7 @@ import socketio
 import config
 
 
-config = config.Config(".\\server\\config.yaml")
+config = config.Config("config.yaml")
 
 verbose = True
 
