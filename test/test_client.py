@@ -40,7 +40,7 @@ def get_buffer(payload):
     print(pv, ': ', buffer[-1])
     print(pv, ': ', timestamps[-1])
 
-sio.connect('http://localhost:5000', auth="I am your father")
+sio.connect('http://localhost:5000', auth="I am your Father")
 
 #sio.emit('put_value', {'pv': 'CLA-C2V-DIA-BPM-01:X', 'value': 1.234})
 #sio.emit('get_value', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
