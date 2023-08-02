@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.append('./lib/machine')
+sys.path.append('./lib/machine/')
 from pv import PVBuffer, PVArrayBuffer
 import numpy as np
 
