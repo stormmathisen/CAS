@@ -1,5 +1,12 @@
 import socketio
 import time
+import sys
+
+n = sys.argv
+if len(n) > 1:
+    ip = n[1]
+else:
+    ip = 'localhost'
 
 sio = socketio.Client()
 
@@ -40,7 +47,7 @@ def get_buffer(payload):
     print(pv, ': ', buffer[-1])
     print(pv, ': ', timestamps[-1])
 
-sio.connect('http://localhost:5000', auth="I am your Father")
+sio.connect(f'http://{ip}:5000', auth="I am your Father")
 
 #sio.emit('put_value', {'pv': 'CLA-C2V-DIA-BPM-01:X', 'value': 1.234})
 #sio.emit('get_value', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
