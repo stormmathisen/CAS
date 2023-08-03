@@ -39,7 +39,7 @@ def check_auth(client_ip, secret):
 PV_list = {}
 Client_list = {}
 
-sio = socketio.Server()
+sio = socketio.Server(cors_allowed_origins='*')
 app = socketio.WSGIApp(sio)
 
 @sio.event
