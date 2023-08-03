@@ -2,6 +2,7 @@ import eventlet
 from eventlet import wsgi
 import socketio
 import config
+import payload
 
 
 config = config.Config(".//server//config.yaml")
@@ -49,13 +50,13 @@ def connect(sid, environ, auth):
     if check_auth(environ['REMOTE_ADDR'], auth):
         new_client['auth'] = auth
         Client_list[sid] = new_client
-        payload = payload.auth_out(
+        data = payload.auth_out(
             server_name=config.server['name'],
             auth=True,
             clients=len(Client_list),
             monitors=list(PV_list.keys())
         ).model_dump()
-        sio.emit('auth_success', room=sid)
+        sio.emit('auth_success', room=sid, data=data)
         if verbose: print(f'Client {Client_list[sid]["sid"]} connected from {Client_list[sid]["ip"]}')
     else:
         new_client['auth'] = None
@@ -72,8 +73,8 @@ def disconnect(sid):
     #TODO: Log the disconnection
 
 @sio.event
-def get_value(sid, payload):
-    pv = payload["pv"]
+def get_value(sid, data):
+    pv = data["pv"]
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested value of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
@@ -84,9 +85,9 @@ def get_value(sid, payload):
     sio.emit('get_value', {'pv': pv, 'value': value}, room=sid)
 
 @sio.event
-def put_value(sid, payload):
-    pv = payload["pv"]
-    value = payload["value"]
+def put_value(sid, data):
+    pv = data["pv"]
+    value = data["value"]
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested to put {value} to {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
@@ -97,8 +98,8 @@ def put_value(sid, payload):
     sio.emit('put_value', {'pv': pv, 'value': value}, room=sid)
 
 @sio.event
-def get_buffer(sid, payload):
-    pv = payload["pv"]
+def get_buffer(sid, data):
+    pv = data["pv"]
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested buffer of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
