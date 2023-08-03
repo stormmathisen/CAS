@@ -5,3 +5,4 @@ pyepics
 eventlet
 pyyaml
 requests
+pydantic

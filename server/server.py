@@ -49,6 +49,12 @@ def connect(sid, environ, auth):
     if check_auth(environ['REMOTE_ADDR'], auth):
         new_client['auth'] = auth
         Client_list[sid] = new_client
+        payload = payload.auth_out(
+            server_name=config.server['name'],
+            auth=True,
+            clients=len(Client_list),
+            monitors=list(PV_list.keys())
+        ).model_dump()
         sio.emit('auth_success', room=sid)
         if verbose: print(f'Client {Client_list[sid]["sid"]} connected from {Client_list[sid]["ip"]}')
     else:
