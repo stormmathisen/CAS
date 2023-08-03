@@ -19,7 +19,8 @@ def disconnect():
     print('disconnected from server')
 
 @sio.event
-def auth_success():
+def auth_success(data):
+    print(data)
     print('auth success')
 
 @sio.event
