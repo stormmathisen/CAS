@@ -17,13 +17,14 @@ class PVInterface(PVBuffer):
         if not self.sio_connected:
             try: 
                 self.sio.connect('http://localhost:5000')
-                self.sio_connected = True#
+                self.sio_connected = True
             except:
                 pass
-        self.sio.emit('send_new', {
-                'sids': self.subscription_list,
-                'name': self.name,
-                'value': self.value})
+        else:
+            self.sio.emit('send_new', {
+                    'sids': self.subscription_list,
+                    'name': self.name,
+                    'value': self.value})
 
     @property
     def buffer_size(self):
