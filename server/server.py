@@ -20,13 +20,17 @@ if config.epics['set-env']:
 else:
     import epics
 
+sio = socketio.Server(cors_allowed_origins='*')
+app = socketio.WSGIApp(sio)
+
+
 import epics_interface as EI
 
 def start_monitors(pvs):
     for pv in pvs:
         if config.epics['state'].lower() == "virtual":
             pv = "VM-" + pv
-        PV_list[pv] = EI.PVInterface(pv)
+        PV_list[pv] = EI.PVInterface(pv, sio=sio)
 
 def check_auth(client_ip, secret):
     if secret in config.auth['api-keys']:
@@ -39,8 +43,6 @@ def check_auth(client_ip, secret):
 PV_list = {}
 Client_list = {}
 
-sio = socketio.Server(cors_allowed_origins='*')
-app = socketio.WSGIApp(sio)
 
 @sio.event
 def connect(sid, environ, auth):
@@ -108,6 +110,49 @@ def get_buffer(sid, data):
         sio.emit('get_buffer', {'pv': pv, 'buffer': buffer, 'timestamps': timestamps}, room=sid)
     except KeyError:
         sio.emit('get_buffer', {'pv': pv, 'buffer': None, 'timestamps': None}, room=sid)
+
+@sio.event
+def start_monitor(sid, data):
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to start monitor of {pv}')
+    pv = data["pv"]
+    length = data["length"]
+    if config.epics['state'].lower() == "virtual":
+        pv = "VM-" + pv
+    if pv not in PV_list:
+        PV_list[pv] = EI.PVInterface(pv)
+        PV_list[pv].buffer_size = length
+    sio.emit("start_monitor", {'pv': pv}, room=sid)
+
+@sio.event
+def stop_monitor(sid, data):
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to start monitor of {pv}')
+    pv = data["pv"]
+    if config.epics['state'].lower() == "virtual":
+        pv = "VM-" + pv
+    if pv in PV_list:
+        PV_list.pop(pv)
+    sio.emit("stop_monitor", {'pv': pv}, room=sid)
+
+@sio.event
+def subscribe(sid, data):
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to subscribe to {pv}')
+    pv = data["pv"]
+    if config.epics['state'].lower() == "virtual":
+        pv = "VM-" + pv
+    if pv not in PV_list:
+        PV_list[pv] = EI.PVInterface(pv)
+    PV_list[pv].subscribe(sid)
+    sio.emit("subscribe", {'pv': pv}, room=sid)
+    
+@sio.event
+def unsubscribe(sid, data):
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to unsubscribe to {pv}')
+    pv = data["pv"]
+    if config.epics['state'].lower() == "virtual":
+        pv = "VM-" + pv
+    if pv in PV_list:
+        PV_list[pv].unsubscribe(sid)
+    sio.emit("unsubscribe", {'pv': pv}, room=sid)
 
 if __name__ == '__main__':
     #TODO: Log the start of the server
