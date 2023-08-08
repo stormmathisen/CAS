@@ -160,7 +160,7 @@ def send_new(sid, payload):
     value = payload['value']
     sids = payload['sids']
     for sid in sids:
-        sio.emit('new_value', {'pv': name, 'value': value})
+        sio.emit('new_value', {'pv': name, 'value': value}, room=sid)
 
 
 
