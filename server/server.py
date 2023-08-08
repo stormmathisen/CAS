@@ -20,7 +20,7 @@ if config.epics['set-env']:
 else:
     import epics
 
-sio = socketio.Server(cors_allowed_origins='*', async_mode='threading')
+sio = socketio.Server(cors_allowed_origins='*')
 app = socketio.WSGIApp(sio)
 
 
@@ -156,7 +156,7 @@ def unsubscribe(sid, data):
 
 def send_new(sids, name, value):
     for sid in sids:
-        sio.emit('new_value', {'pv': name, 'value': value}, room=sid)
+        sio.emit('new_value', {'pv': name, 'value': value})
 
 
 
