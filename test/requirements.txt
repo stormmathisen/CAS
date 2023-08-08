@@ -1,0 +1,5 @@
+numpy
+python-socketio[client]
+pyyaml
+requests
+pydantic
