@@ -14,7 +14,8 @@ class PVInterface(PVBuffer):
         super().callback(**kwargs)
         if self.sio is not None:
             print("Emitting")
-            self.sio.emit('new_value', {'pv': self.name, 'value': self.value}, room=self.subscription_list)
+            for sid in self.subscription_list:
+                self.sio.emit('new_value', {'pv': self.name, 'value': self.value}, room=sid)
 
     @property
     def buffer_size(self):
