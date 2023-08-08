@@ -20,7 +20,7 @@ if config.epics['set-env']:
 else:
     import epics
 
-sio = socketio.Server(cors_allowed_origins='*')
+sio = socketio.Server(cors_allowed_origins='*', async_mode='threading')
 app = socketio.WSGIApp(sio)
 
 
