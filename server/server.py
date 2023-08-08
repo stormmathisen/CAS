@@ -30,7 +30,7 @@ def start_monitors(pvs):
     for pv in pvs:
         if config.epics['state'].lower() == "virtual":
             pv = "VM-" + pv
-        PV_list[pv] = EI.PVInterface(pv, sio=sio)
+        PV_list[pv] = EI.PVInterface(pv, nf=send_new)
 
 def check_auth(client_ip, secret):
     if secret in config.auth['api-keys']:
