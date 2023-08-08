@@ -12,12 +12,7 @@ class PVInterface(PVBuffer):
 
     def callback(self, **kwargs):
         super().callback(**kwargs)
-        if self.sio is not None:
-            print("Emitting")
-            for sid in self.subscription_list:
-                print(sid)
-                self.sio.emit('new_value', {'pv': self.name, 'value': self.value}, room=sid)
-
+        self.new_fun(self.subscription_list, self.name, self.value)
     @property
     def buffer_size(self):
         return self.maxlen
