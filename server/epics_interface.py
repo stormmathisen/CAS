@@ -1,18 +1,23 @@
 import os
 import sys
+import socketio
 sys.path.append('./lib/machine/')
 from pv import PVBuffer, PVArrayBuffer
 import numpy as np
 
 class PVInterface(PVBuffer):
     def __init__(self, pv_name, buffer_size=128, nf=None, **kwargs):
-        self.new_fun = nf
+        self.sio = socketio.Client()
+        self.sio.connect('localhost:5000')
         self.subscription_list = []
         super().__init__(pv_name, maxlen=buffer_size)
 
     def callback(self, **kwargs):
         super().callback(**kwargs)
-        self.new_fun(self.subscription_list, self.name, self.value)
+        self.sio.emit('send_new', {
+                'sids': self.subscription_list,
+                'name': self.name,
+                'value': self.value})
 
     @property
     def buffer_size(self):

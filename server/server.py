@@ -154,7 +154,8 @@ def unsubscribe(sid, data):
         PV_list[pv].unsubscribe(sid)
     sio.emit("unsubscribe", {'pv': pv}, room=sid)
 
-def send_new(sids, name, value):
+@sio.event
+def send_new(sid, sids, name, value):
     for sid in sids:
         sio.emit('new_value', {'pv': name, 'value': value})
 
