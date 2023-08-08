@@ -113,8 +113,8 @@ def get_buffer(sid, data):
 
 @sio.event
 def start_monitor(sid, data):
-    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to start monitor of {pv}')
     pv = data["pv"]
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to start monitor of {pv}')
     length = data["length"]
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
@@ -125,8 +125,8 @@ def start_monitor(sid, data):
 
 @sio.event
 def stop_monitor(sid, data):
-    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to start monitor of {pv}')
     pv = data["pv"]
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to start monitor of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv in PV_list:
@@ -135,8 +135,8 @@ def stop_monitor(sid, data):
 
 @sio.event
 def subscribe(sid, data):
-    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to subscribe to {pv}')
     pv = data["pv"]
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to subscribe to {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv not in PV_list:
@@ -146,8 +146,8 @@ def subscribe(sid, data):
     
 @sio.event
 def unsubscribe(sid, data):
-    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to unsubscribe to {pv}')
     pv = data["pv"]
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to unsubscribe to {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv in PV_list:
