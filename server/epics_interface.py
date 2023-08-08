@@ -15,8 +15,11 @@ class PVInterface(PVBuffer):
     def callback(self, **kwargs):
         super().callback(**kwargs)
         if not self.sio_connected:
-            self.sio.connect('http://localhost:5000')
-            self.sio_connected = True
+            try: 
+                self.sio.connect('http://localhost:5000')
+                self.sio_connected = True#
+            except:
+                pass
         self.sio.emit('send_new', {
                 'sids': self.subscription_list,
                 'name': self.name,
