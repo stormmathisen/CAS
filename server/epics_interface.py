@@ -6,9 +6,9 @@ import numpy as np
 
 class PVInterface(PVBuffer):
     def __init__(self, pv_name, buffer_size=128, sio=None, **kwargs):
-        super().__init__(pv_name, maxlen=buffer_size)
         self.sio = sio
         self.subscription_list = []
+        super().__init__(pv_name, maxlen=buffer_size)
 
     def callback(self, **kwargs):
         super().callback(**kwargs)
