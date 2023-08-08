@@ -154,6 +154,12 @@ def unsubscribe(sid, data):
         PV_list[pv].unsubscribe(sid)
     sio.emit("unsubscribe", {'pv': pv}, room=sid)
 
+def send_new(sids, name, value):
+    for sid in sids:
+        sio.emit('new_value', {'pv': name, 'value': value}, room=sid)
+
+
+
 if __name__ == '__main__':
     #TODO: Log the start of the server
     start_monitors(config.epics['pv-list'])
