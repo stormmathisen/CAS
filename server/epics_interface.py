@@ -15,6 +15,7 @@ class PVInterface(PVBuffer):
         if self.sio is not None:
             print("Emitting")
             for sid in self.subscription_list:
+                print(sid)
                 self.sio.emit('new_value', {'pv': self.name, 'value': self.value}, room=sid)
 
     @property
