@@ -48,11 +48,19 @@ def get_buffer(payload):
     print(pv, ': ', buffer[-1])
     print(pv, ': ', timestamps[-1])
 
+@sio.event
+def new_value(payload):
+    pv = payload['pv']
+    value = payload['value']
+    print(pv, ': ', value)
+
 sio.connect(f'http://{ip}:5000', auth="I am your Father")
 
 #sio.emit('put_value', {'pv': 'CLA-C2V-DIA-BPM-01:X', 'value': 1.234})
 #sio.emit('get_value', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 #sio.sleep(2)
 sio.emit('get_buffer', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
+sio.sleep(1)
+sio.emit('subscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 sio.sleep(10)
 sio.disconnect()
