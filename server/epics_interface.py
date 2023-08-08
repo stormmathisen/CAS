@@ -8,7 +8,7 @@ import numpy as np
 class PVInterface(PVBuffer):
     def __init__(self, pv_name, buffer_size=128, nf=None, **kwargs):
         self.sio = socketio.Client()
-        self.sio.connect('localhost:5000')
+        self.sio.connect('http://localhost:5000')
         self.subscription_list = []
         super().__init__(pv_name, maxlen=buffer_size)
 
