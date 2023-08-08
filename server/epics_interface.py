@@ -5,14 +5,15 @@ from pv import PVBuffer, PVArrayBuffer
 import numpy as np
 
 class PVInterface(PVBuffer):
-    def __init__(self, pv_name, buffer_size=128, sio=None, **kwargs):
-        self.sio = sio
+    def __init__(self, pv_name, buffer_size=128, nf=None, **kwargs):
+        self.new_fun = nf
         self.subscription_list = []
         super().__init__(pv_name, maxlen=buffer_size)
 
     def callback(self, **kwargs):
         super().callback(**kwargs)
         self.new_fun(self.subscription_list, self.name, self.value)
+
     @property
     def buffer_size(self):
         return self.maxlen
