@@ -13,6 +13,7 @@ class PVInterface(PVBuffer):
     def callback(self, **kwargs):
         super().callback(**kwargs)
         if self.sio is not None:
+            print("Emitting")
             self.sio.emit('new_value', {'pv': self.name, 'value': self.value}, room=self.subscription_list)
 
     @property
