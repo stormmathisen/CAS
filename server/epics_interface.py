@@ -8,12 +8,15 @@ import numpy as np
 class PVInterface(PVBuffer):
     def __init__(self, pv_name, buffer_size=128, nf=None, **kwargs):
         self.sio = socketio.Client()
-        self.sio.connect('http://localhost:5000')
+        self.connected = False
         self.subscription_list = []
         super().__init__(pv_name, maxlen=buffer_size)
 
     def callback(self, **kwargs):
         super().callback(**kwargs)
+        if not self.connected:
+            self.sio.connect('http://localhost:5000')
+            self.connected = True
         self.sio.emit('send_new', {
                 'sids': self.subscription_list,
                 'name': self.name,
