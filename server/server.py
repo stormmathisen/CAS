@@ -162,7 +162,11 @@ def send_new(sid, payload):
     for sid in sids:
         sio.emit('new_value', {'pv': name, 'value': value}, room=sid)
 
-
+@sio.event
+def list_monitors(sid, payload):
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested list of monitors')
+    monitors = list(PV_list.keys())
+    sio.emit('list_monitors', {'monitors': monitors}, room=sid)
 
 if __name__ == '__main__':
     #TODO: Log the start of the server
