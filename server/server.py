@@ -49,7 +49,7 @@ def connect(sid, environ, auth):
     new_client = {}
     new_client['sid'] = sid
     new_client['ip'] = environ['REMOTE_ADDR']
-    if check_auth(environ['REMOTE_ADDR'], auth):
+    if check_auth(environ['REMOTE_ADDR'], auth): #If authentication successful
         new_client['auth'] = auth
         Client_list[sid] = new_client
         data = payload.auth_out(
@@ -60,10 +60,16 @@ def connect(sid, environ, auth):
         ).model_dump()
         sio.emit('auth_success', room=sid, data=data)
         if verbose: print(f'Client {Client_list[sid]["sid"]} connected from {Client_list[sid]["ip"]}')
-    else:
+    else: #If not authenticated, refuse connection
         new_client['auth'] = None
         Client_list[sid] = new_client
-        sio.emit('auth_fail', room=sid)
+        data = payload.auth_out(
+            server_name=config.server['name'],
+            auth=False,
+            clients=-1,
+            monitors=[]
+        ).model_dump()
+        sio.emit('auth_fail', data=data, room=sid)
         if verbose: print(f'Client {Client_list[sid]["sid"]} refused from {Client_list[sid]["ip"]}')
         sio.disconnect(sid)
     #TODO: Log the connection
