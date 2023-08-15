@@ -3,6 +3,8 @@ from eventlet import wsgi
 import socketio
 import config
 import payload
+from pydantic import ValidationError
+from time import time
 
 
 config = config.Config(".//server//config.yaml")
@@ -82,15 +84,37 @@ def disconnect(sid):
 
 @sio.event
 def get_value(sid, data):
-    pv = data["pv"]
+    try:
+        data_in = payload.get_value_in(**data)
+    except ValidationError  as e:
+        print(f'Client {Client_list[sid]["sid"]} sent invalid payload')
+        sio.emit('validation_error', {'error': e.errors()}, room=sid)
+        return
+    pv = data_in.pv_name
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested value of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     try: #This is faster than checking if the PV exists in the dictionary
         value = PV_list[pv].value
+        data = payload.get_value_out(
+            server_name=config.server['name'],
+            pv_name=pv,
+            value=value,
+            timestamp=PV_list[pv].time,
+            fallback=False
+        ).model_dump()
+
     except KeyError:
         value = epics.caget(pv)
-    sio.emit('get_value', {'pv': pv, 'value': value}, room=sid)
+        data = payload.get_value_out(
+            server_name=config.server['name'],
+            pv_name=pv,
+            value=value,
+            timestamp=time.time(),
+            fallback=True
+        ).model_dump()
+
+    sio.emit('get_value', data, room=sid)
 
 @sio.event
 def put_value(sid, data):
