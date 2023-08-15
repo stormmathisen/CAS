@@ -1,0 +1,1 @@
+docker build -t cas-server -f .\Docker\Dockerfile .
