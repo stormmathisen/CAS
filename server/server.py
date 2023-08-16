@@ -33,6 +33,8 @@ def start_monitors(pvs):
         if config.epics['state'].lower() == "virtual":
             pv = "VM-" + pv
         PV_list[pv] = EI.PVInterface(pv, nf=send_new)
+        PV_list[pv].writeAccess = True
+        PV_list[pv].pv.connect()
 
 def check_auth(client_ip, secret):
     if secret in config.auth['api-keys']:
@@ -110,7 +112,7 @@ def get_value(sid, data):
             server_name=config.server['name'],
             pv_name=pv,
             value=value,
-            timestamp=time.time(),
+            timestamp=time(),
             fallback=True
         ).model_dump()
 
@@ -151,6 +153,8 @@ def start_monitor(sid, data):
     if pv not in PV_list:
         PV_list[pv] = EI.PVInterface(pv)
         PV_list[pv].buffer_size = length
+        PV_list[pv].writeAccess = True
+        PV_list[pv].pv.connect()
     sio.emit("start_monitor", {'pv': pv}, room=sid)
 
 @sio.event
