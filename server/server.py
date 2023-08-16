@@ -120,16 +120,41 @@ def get_value(sid, data):
 
 @sio.event
 def put_value(sid, data):
-    pv = data["pv"]
-    value = data["value"]
-    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to put {value} to {pv}')
+    try:
+        data_in = payload.put_value_in(**data)
+    except ValidationError  as e:
+        print(f'Client {Client_list[sid]["sid"]} sent invalid payload')
+        sio.emit('validation_error', {'error': e.errors()}, room=sid)
+        return
+    pv = data_in.pv_name
+    new_value = data_in.new_value
+    if verbose: print(f'Client {Client_list[sid]["sid"]} requested to put {new_value} to {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     try: #This is faster than checking if the PV exists in the dictionary
-        PV_list[pv].value = value
+        old_value = PV_list[pv].value
+        PV_list[pv].value = new_value
+        data = payload.put_value_out(
+            server_name=config.server['name'],
+            pv_name=pv,
+            old_value=old_value,
+            new_value=new_value,
+            timestamp=PV_list[pv].time,
+            fallback=False
+        ).model_dump()
+        sio.emit('put_value', data, room=sid)
     except KeyError:
-        epics.caput(pv, value)
-    sio.emit('put_value', {'pv': pv, 'value': value}, room=sid)
+        old_value = epics.caget(pv)
+        epics.caput(pv, new_value)
+        data = payload.put_value_out(
+            server_name=config.server['name'],
+            pv_name=pv,
+            old_value=old_value,
+            new_value=new_value,
+            timestamp=time(),
+            fallback=True
+        ).model_dump()
+    sio.emit('put_value', data, room=sid)
 
 @sio.event
 def get_buffer(sid, data):

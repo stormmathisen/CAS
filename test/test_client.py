@@ -35,8 +35,8 @@ def get_value(payload):
 
 @sio.event
 def put_value(payload):
-    pv = payload['pv']
-    value = payload['value']
+    pv = payload['pv_name']
+    value = payload['new_value']
     print(pv, ': ', value)
 
 @sio.event
@@ -65,13 +65,17 @@ def validation_error(payload):
     print(payload)
 
 sio.connect(f'http://{ip}:5000', auth="I am your Father")
-
+print("Putting to monitored value")
 sio.emit('put_value', {'pv': 'CLA-C2V-DIA-BPM-01:X', 'value': 1.234})
 sio.sleep(1)
+sio.emit('put_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'new_value': 1.234})
+sio.sleep(1)
+print("Putting to fallback values")
 sio.emit('put_value', {'pv': 'CLA-S01-DIA-BPM-01:X', 'value': 5.678})
 sio.sleep(1)
-sio.emit('get_value', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
+sio.emit('put_value', {'pv_name': 'CLA-S01-DIA-BPM-01:X', 'new_value': 5.678})
 sio.sleep(1)
+print('Getting values')
 sio.emit('get_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X'})
 sio.sleep(1)
 sio.emit('get_value', {'pv_name': 'CLA-S01-DIA-BPM-01:X'})
@@ -79,10 +83,10 @@ sio.sleep(2)
 # sio.emit('start_monitor', {'pv': 'CLA-S01-DIA-BPM-01:X', 'length': 10})
 # sio.emit('get_buffer', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 # sio.sleep(1)
-sio.emit('subscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
-sio.emit('put_value', {'pv': 'CLA-C2V-DIA-BPM-01:X', 'value': 1.234})
-sio.sleep(2)
-sio.emit('unsubscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
+# sio.emit('subscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
+# sio.emit('put_value', {'pv': 'CLA-C2V-DIA-BPM-01:X', 'value': 1.234})
+# sio.sleep(2)
+# sio.emit('unsubscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 # sio.emit('subscribe', {'pv': 'CLA-S01-DIA-BPM-01:X'})
 # sio.emit('get_buffer', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 # sio.sleep(1)
