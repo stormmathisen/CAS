@@ -24,6 +24,7 @@ class PVInterface(PVBuffer):
             self.sio.emit('send_new', {
                     'sids': self.subscription_list,
                     'name': self.name,
+                    'time': self.time,
                     'value': self.value})
 
     @property

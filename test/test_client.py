@@ -50,9 +50,10 @@ def get_buffer(payload):
 
 @sio.event
 def new_value(payload):
-    pv = payload['pv']
+    pv = payload['pv_name']
     value = payload['value']
-    print(pv, ': ', value)
+    time= payload['timestamp']
+    print(pv, ': ', value, "at", time)
 
 
 @sio.event
@@ -83,10 +84,10 @@ sio.sleep(2)
 # sio.emit('start_monitor', {'pv': 'CLA-S01-DIA-BPM-01:X', 'length': 10})
 # sio.emit('get_buffer', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 # sio.sleep(1)
-# sio.emit('subscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
-# sio.emit('put_value', {'pv': 'CLA-C2V-DIA-BPM-01:X', 'value': 1.234})
-# sio.sleep(2)
-# sio.emit('unsubscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
+sio.emit('subscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
+sio.emit('put_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'new_value': 12.345})
+sio.sleep(2)
+sio.emit('unsubscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 # sio.emit('subscribe', {'pv': 'CLA-S01-DIA-BPM-01:X'})
 # sio.emit('get_buffer', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 # sio.sleep(1)
