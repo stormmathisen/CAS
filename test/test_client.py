@@ -53,7 +53,7 @@ def new_value(payload):
     pv = payload['pv_name']
     value = payload['value']
     time= payload['timestamp']
-    print(pv, ': ', value, "at", time)
+    print('New value:', pv, ': ', value, "at", time)
 
 
 @sio.event
@@ -86,6 +86,8 @@ sio.sleep(2)
 # sio.sleep(1)
 sio.emit('subscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 sio.emit('put_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'new_value': 12.345})
+sio.emit('put_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'new_value': 23.456})
+sio.emit('put_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'new_value': 34.567})
 sio.sleep(2)
 sio.emit('unsubscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 # sio.emit('subscribe', {'pv': 'CLA-S01-DIA-BPM-01:X'})

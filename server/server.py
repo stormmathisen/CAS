@@ -214,19 +214,19 @@ def unsubscribe(sid, data):
     sio.emit("unsubscribe", {'pv': pv}, room=sid)
 
 @sio.event
-def send_new(sid, payload):
-    name = payload['name']
-    value = payload['value']
-    time = payload['time']
-    sids = payload['sids']
-    data = payload.new_value(
+def send_new(sid, data):
+    name = data['name']
+    value = data['value']
+    time = data['time']
+    sids = data['sids']
+    new_data = payload.new_value(
         server_name=config.server['name'],
         pv_name=name,
         value=value,
         timestamp=time
     ).model_dump()
     for sid in sids:
-        sio.emit('new_value', data, room=sid)
+        sio.emit('new_value', new_data, room=sid)
 
 @sio.event
 def list_monitors(sid, payload):
