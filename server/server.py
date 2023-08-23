@@ -158,12 +158,23 @@ def put_value(sid, data):
 
 @sio.event
 def get_buffer(sid, data):
-    pv = data["pv"]
+    try:
+        data_in = payload.get_buffer_in(**data)
+    except ValidationError  as e:
+        print(f'Client {Client_list[sid]["sid"]} sent invalid payload')
+        sio.emit('validation_error', {'error': e.errors()}, room=sid)
+        return
+    pv = data_in.pv_name
+    length = data_in.buffer_size
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested buffer of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     try: #This is faster than checking if the PV exists in the dictionary
         buffer, timestamps = PV_list[pv].get_buffers()
+        buf_size = PV_list[pv].buffer_size
+        if length < buf_size:
+            buffer = buffer[buf_size-length:buf_size]
+            timestamps = timestamps[buf_size-length:buf_size]
         sio.emit('get_buffer', {'pv': pv, 'buffer': buffer, 'timestamps': timestamps}, room=sid)
     except KeyError:
         sio.emit('get_buffer', {'pv': pv, 'buffer': None, 'timestamps': None}, room=sid)

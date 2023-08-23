@@ -31,7 +31,8 @@ class put_value_out(pd.BaseModel, Generic[EpicsType]):
     fallback: bool #Whether or not ca fallback was used
 
 class get_buffer_in(pd.BaseModel, Generic[EpicsType]):
-    pass
+    pv_name: str
+    buffer_size: int
 
 class get_buffer_out(pd.BaseModel, Generic[EpicsType]):
     pass
@@ -53,4 +54,7 @@ class start_monitor(pd.BaseModel, Generic[EpicsType]):
     pass
 
 class stop_monitor(pd.BaseModel, Generic[EpicsType]):
+    pass
+
+class list_monitors(pd.BaseModel, Generic[EpicsType]):
     pass
