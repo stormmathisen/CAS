@@ -32,10 +32,14 @@ class put_value_out(pd.BaseModel, Generic[EpicsType]):
 
 class get_buffer_in(pd.BaseModel, Generic[EpicsType]):
     pv_name: str
-    buffer_size: int
+    length: int
 
 class get_buffer_out(pd.BaseModel, Generic[EpicsType]):
-    pass
+    server_name: str = 'None' #Not mandatory
+    pv_name: str #Must be a valid PV name
+    buffer: List[EpicsType] #Must be a valid EPICS type (str, int, float, bool or bytes)
+    timestamps: List[float] #Time of last update in seconds
+    length: int #Length of the buffer
 
 class subscribe_in(pd.BaseModel, Generic[EpicsType]):
     pass

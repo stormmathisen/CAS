@@ -41,10 +41,11 @@ def put_value(payload):
 
 @sio.event
 def get_buffer(payload):
-    pv = payload['pv']
+    pv = payload['pv_name']
     buffer = payload['buffer']
     timestamps = payload['timestamps']
-    print(pv, ': ', len(buffer))
+    length = payload['length']
+    print(pv, ': ', length)
     print(pv, ': ', buffer[-1])
     print(pv, ': ', timestamps[-1])
 
@@ -83,10 +84,10 @@ sio.connect(f'http://{ip}:5000', auth="I am your Father")
 # sio.sleep(2)
 for i in range(250):
     sio.emit('put_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'new_value': i})
-    sio.sleep(0.1)
+    sio.sleep(0.01)
 print('Getting buffers')
 # sio.emit('start_monitor', {'pv': 'CLA-S01-DIA-BPM-01:X', 'length': 10})
-sio.emit('get_buffer', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'buffer_size': 10})
+sio.emit('get_buffer', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'length': 10})
 # sio.sleep(1)
 # sio.emit('subscribe', {'pv': 'CLA-C2V-DIA-BPM-01:X'})
 # sio.emit('put_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'new_value': 12.345})

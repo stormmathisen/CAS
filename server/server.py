@@ -154,7 +154,7 @@ def put_value(sid, data):
             timestamp=time(),
             fallback=True
         ).model_dump()
-    sio.emit('put_value', data, room=sid)
+        sio.emit('put_value', data, room=sid)
 
 @sio.event
 def get_buffer(sid, data):
@@ -165,7 +165,7 @@ def get_buffer(sid, data):
         sio.emit('validation_error', {'error': e.errors()}, room=sid)
         return
     pv = data_in.pv_name
-    length = data_in.buffer_size
+    length = data_in.length
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested buffer of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
@@ -175,7 +175,14 @@ def get_buffer(sid, data):
         if length < buf_size:
             buffer = buffer[buf_size-length:buf_size]
             timestamps = timestamps[buf_size-length:buf_size]
-        sio.emit('get_buffer', {'pv': pv, 'buffer': buffer, 'timestamps': timestamps}, room=sid)
+        data = payload.get_buffer_out(
+            server_name=config.server['name'],
+            pv_name=pv,
+            buffer=buffer,
+            timestamps=timestamps,
+            length=len(buffer)
+        ).model_dump()
+        sio.emit('get_buffer', data, room=sid)
     except KeyError:
         sio.emit('get_buffer', {'pv': pv, 'buffer': None, 'timestamps': None}, room=sid)
 
