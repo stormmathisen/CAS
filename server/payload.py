@@ -54,10 +54,11 @@ class new_value(pd.BaseModel, Generic[EpicsType]):
 
 
 class start_monitor(pd.BaseModel, Generic[EpicsType]):
-    pass
+    pv_name: str #Must be a valid PV name
+    length: int #Length of the buffer
 
 class stop_monitor(pd.BaseModel, Generic[EpicsType]):
-    pass
+    pv_name: str #Must be a valid PV name
 
 class list_monitors(pd.BaseModel, Generic[EpicsType]):
     pass

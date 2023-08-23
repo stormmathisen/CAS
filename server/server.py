@@ -188,9 +188,15 @@ def get_buffer(sid, data):
 
 @sio.event
 def start_monitor(sid, data):
-    pv = data["pv"]
+    try:
+        data_in = payload.start_monitor(**data)
+    except ValidationError  as e:
+        print(f'Client {Client_list[sid]["sid"]} sent invalid payload')
+        sio.emit('validation_error', {'error': e.errors()}, room=sid)
+        return
+    pv = data_in.pv_name
+    length = data_in.length
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested to start monitor of {pv}')
-    length = data["length"]
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv not in PV_list:
@@ -198,7 +204,7 @@ def start_monitor(sid, data):
         PV_list[pv].buffer_size = length
         PV_list[pv].writeAccess = True
         PV_list[pv].pv.connect()
-    sio.emit("start_monitor", {'pv': pv}, room=sid)
+    sio.emit("start_monitor", data_in.model_dump(), room=sid)
 
 @sio.event
 def stop_monitor(sid, data):
@@ -228,7 +234,7 @@ def subscribe(sid, data):
     data = payload.subscribe(
         server_name=config.server['name'],
         pv_name=pv
-    )
+    ).model_dump()
     sio.emit("subscribe", data, room=sid)
     
 @sio.event
@@ -248,7 +254,7 @@ def unsubscribe(sid, data):
     data = payload.subscribe(
         server_name=config.server['name'],
         pv_name=pv
-    )
+    ).model_dump()
     sio.emit("unsubscribe", data, room=sid)
 
 @sio.event
