@@ -212,24 +212,44 @@ def stop_monitor(sid, data):
 
 @sio.event
 def subscribe(sid, data):
-    pv = data["pv"]
+    try:
+        data_in = payload.subscribe(**data)
+    except ValidationError  as e:
+        print(f'Client {Client_list[sid]["sid"]} sent invalid payload')
+        sio.emit('validation_error', {'error': e.errors()}, room=sid)
+        return
+    pv = data_in.pv_name
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested to subscribe to {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv not in PV_list:
         PV_list[pv] = EI.PVInterface(pv)
     PV_list[pv].subscribe(sid)
-    sio.emit("subscribe", {'pv': pv}, room=sid)
+    data = payload.subscribe(
+        server_name=config.server['name'],
+        pv_name=pv
+    )
+    sio.emit("subscribe", data, room=sid)
     
 @sio.event
 def unsubscribe(sid, data):
-    pv = data["pv"]
+    try:
+        data_in = payload.subscribe(**data)
+    except ValidationError  as e:
+        print(f'Client {Client_list[sid]["sid"]} sent invalid payload')
+        sio.emit('validation_error', {'error': e.errors()}, room=sid)
+        return
+    pv = data_in.pv_name
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested to unsubscribe to {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv in PV_list:
         PV_list[pv].unsubscribe(sid)
-    sio.emit("unsubscribe", {'pv': pv}, room=sid)
+    data = payload.subscribe(
+        server_name=config.server['name'],
+        pv_name=pv
+    )
+    sio.emit("unsubscribe", data, room=sid)
 
 @sio.event
 def send_new(sid, data):

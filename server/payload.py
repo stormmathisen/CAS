@@ -41,11 +41,10 @@ class get_buffer_out(pd.BaseModel, Generic[EpicsType]):
     timestamps: List[float] #Time of last update in seconds
     length: int #Length of the buffer
 
-class subscribe_in(pd.BaseModel, Generic[EpicsType]):
-    pass
+class subscribe(pd.BaseModel, Generic[EpicsType]):
+    server_name: str = 'None' #Not mandatory
+    pv_name: str #Must be a valid PV name
 
-class subscribe_out(pd.BaseModel, Generic[EpicsType]):
-    pass
 
 class new_value(pd.BaseModel, Generic[EpicsType]):
     server_name: str = 'None' #Not mandatory
