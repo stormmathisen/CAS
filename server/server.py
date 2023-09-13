@@ -208,13 +208,19 @@ def start_monitor(sid, data):
 
 @sio.event
 def stop_monitor(sid, data):
-    pv = data["pv"]
+    try:
+        data_in = payload.start_monitor(**data)
+    except ValidationError  as e:
+        print(f'Client {Client_list[sid]["sid"]} sent invalid payload')
+        sio.emit('validation_error', {'error': e.errors()}, room=sid)
+        return
+    pv = data_in.pv_name
     if verbose: print(f'Client {Client_list[sid]["sid"]} requested to start monitor of {pv}')
     if config.epics['state'].lower() == "virtual":
         pv = "VM-" + pv
     if pv in PV_list:
         PV_list.pop(pv)
-    sio.emit("stop_monitor", {'pv': pv}, room=sid)
+    sio.emit("stop_monitor", data_in.model_dump(), room=sid)
 
 @sio.event
 def subscribe(sid, data):
