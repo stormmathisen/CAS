@@ -82,9 +82,9 @@ sio.connect(f'http://{ip}:5000', auth="I am your Father")
 # sio.sleep(1)
 # sio.emit('get_value', {'pv_name': 'CLA-S01-DIA-BPM-01:X'})
 # sio.sleep(2)
-for i in range(250):
-    sio.emit('put_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'new_value': i})
-sio.sleep(1)
+# for i in range(250):
+#     sio.emit('put_value', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'new_value': i})
+sio.sleep(5)
 print('Getting buffers')
 sio.emit('start_monitor', {'pv_name': 'CLA-S01-DIA-BPM-01:X', 'length': 10})
 sio.emit('get_buffer', {'pv_name': 'CLA-C2V-DIA-BPM-01:X', 'length': 10})
